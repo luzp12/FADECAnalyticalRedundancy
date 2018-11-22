@@ -12,3 +12,7 @@ grouse/backups/Untitled3.m
 *.mat
 model/abcd.mat
 model/abcd1112.mat
+data/Tail_687_2/backups/CalStateModel.m
+data/Tail_687_2/backups/GetSteadyPoint.m
+data/Tail_687_2/backups/StateModel2.m
+data/Tail_687_2/Getdata4statemodel1112.m
