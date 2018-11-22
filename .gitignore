@@ -8,3 +8,7 @@ grouse/backups/Project_Omega.m
 grouse/backups/Untitled.m
 grouse/backups/Untitled2.m
 grouse/backups/Untitled3.m
+*.mat
+*.mat
+model/abcd.mat
+model/abcd1112.mat
