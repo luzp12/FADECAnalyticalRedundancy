@@ -16,3 +16,11 @@ data/Tail_687_2/backups/CalStateModel.m
 data/Tail_687_2/backups/GetSteadyPoint.m
 data/Tail_687_2/backups/StateModel2.m
 data/Tail_687_2/Getdata4statemodel1112.m
+model/CF600Model.m
+model/FADEC_Model.mdl
+model/Getdata4anything.m
+model/Getdata4statemodel.m
+model/Getdata4steadymodel1.m
+model/Preanalysis.m
+model/StatePointAnalysisUsingKF.m
+model/SteadyPointAnalysis.m
