@@ -25,3 +25,4 @@ model/Preanalysis.m
 model/StatePointAnalysisUsingKF.m
 model/SteadyPointAnalysis.m
 *.asv
+*.fig
