@@ -26,3 +26,7 @@ model/StatePointAnalysisUsingKF.m
 model/SteadyPointAnalysis.m
 *.asv
 *.fig
+data/微型涡喷发动机数据/20140910-01.TXT
+data/微型涡喷发动机数据/20140910-02.TXT
+data/微型涡喷发动机数据/20151026.TXT
+data/微型涡喷发动机数据/20140910-03.TXT
