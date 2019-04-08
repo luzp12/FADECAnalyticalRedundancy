@@ -1,18 +1,29 @@
+%======初始化，载入数据======
 clear;
 close all;
 %载入原始数据
-load Data01.mat;
+load Data02.mat;
 load DataJudgement.mat;
-load ab.mat;
-A=A(1:4000,1:8);
+% load ab.mat;
+A=A(:,1:8);
 
 
-%设置故障部位和模式:部位，模式，故障时间
+%======设置故障部位和模式======
+%格式：部位，模式，故障时间
 %部位：'N1','N2','FF','EGT','TAT','PT','OIP','OIT','PLA'，'N1','N2','FF','EGT','TAT','PT'
 %模式：1：偏置 2：漂移 3：误差
-FaultMode=[1 8;1 3 ;1000 1500];%
-%生成余度数据、注入故障
+tfault=[5000 10000 15000]
+FaultMode=[1;1;tfault(1)];
+
+%======设置故障强度=======
+lb=0.08;%偏置 
+ld=0.01;%漂移
+Normal_Noise_Level=0.0001;%正常噪声强度
+ln=500*Normal_Noise_Level;%噪声
+
+%======生成余度数据，注入故障======
 Data2Sensor;
+
 %传感器故障记录矩阵
 SensorFaultRecord=zeros(size( Data2Sensor_Fault));
 NoUpdate=[];
@@ -47,15 +58,15 @@ for k=m:totaltime%length(Data2Sensor_Fault)
   %参数测量矩阵输出值：两个余度的平均值
   Data2Controller(k,S_2hr1)=mean([Data2Sensor_Fault(k,S_2hr1);Data2Sensor_Fault(k,S_2hr2)]);
   Data2Controller(k,S_1hr)=Data2Sensor_Fault(k,S_1hr);
-  %==================FDIA Step2:AR for Sensors ==================
   
-  Mk= Data2Controller(k-m+1:k,1:n2hr+n1hr+npla);
+  %==================FDIA Step2:AR for Sensors ==================
+  Mk=Data2Controller(k-m+1:k,1:n2hr+n1hr+npla);
   %归一化
   [NMk,minMk,maxMk]=NormalData(Mk);
   %设置观测矩阵
   Omega=ones(size(Mk));
   Omega(m,[VotedSensor S_1hr])=0;
-  Omega(m-3:m-1,S_1hr)=Omega(m-3:m-1,S_1hr)-SensorFaultRecord(k-3:k-1,S_1hr);
+  Omega(m-3:m-1,[VotedSensor S_1hr])=Omega(m-3:m-1,[VotedSensor S_1hr])-repmat(max(SensorFaultRecord(k-3:k-1,S_1hr)),3,1);
   %矩阵填充
   [NMkc,U]=ARbyGROUSE(U,NMk,Omega,maxrank,Psai0,NoUpdate);
   %反归一化
@@ -69,7 +80,7 @@ for k=m:totaltime%length(Data2Sensor_Fault)
       SensorFaultRecord(k,S_2hr1(s2n))=0;
       SensorFaultRecord(k,S_2hr2(s2n))=1;
           %连续周期故障时，确认故障
-          if sum(SensorFaultRecord(k-3:k,S_2hr2(s2n)))>=2||sum(SensorFaultRecord(k-9:k,S_2hr2(s2n)))>=6
+          if sum(SensorFaultRecord(k-3:k,S_2hr2(s2n)))>=3||sum(SensorFaultRecord(k-9:k,S_2hr2(s2n)))>=6
               %确认故障后，屏蔽掉该传感器
               Data2Sensor_Fault(k+1:totaltime,S_2hr2(s2n))=Data2Sensor_Fault(k+1:totaltime,S_2hr1(s2n));
           end
@@ -80,7 +91,7 @@ for k=m:totaltime%length(Data2Sensor_Fault)
           SensorFaultRecord(k,S_2hr1(s2n))=1;
           SensorFaultRecord(k,S_2hr2(s2n))=0;
           %连续周期故障时，确认故障
-          if sum(SensorFaultRecord(k-3:k,S_2hr1(s2n)))>=2||sum(SensorFaultRecord(k-9:k,S_2hr1(s2n)))>=6
+          if sum(SensorFaultRecord(k-3:k,S_2hr1(s2n)))>=3||sum(SensorFaultRecord(k-9:k,S_2hr1(s2n)))>=6
               %确认故障后，屏蔽掉该传感器
               Data2Sensor_Fault(k+1:totaltime,S_2hr1(s2n))=Data2Sensor_Fault(k+1:totaltime,S_2hr2(s2n));
           end
@@ -95,14 +106,16 @@ for k=m:totaltime%length(Data2Sensor_Fault)
           SensorFaultRecord(k,s1n)=1;
           %重构故障
           Data2Controller(k,s1n)=[Data2Controller(k,1:6) 1]*ab(:,s1n);
+          
           %确认故障：4个周期
-          if sum(SensorFaultRecord(k-3:k,s1n))==4
+          if sum(SensorFaultRecord(k-3:k,s1n))>=3||sum(SensorFaultRecord(k-9:k,s1n))>=6
               NoUpdate=[NoUpdate s1n]
           end 
       %2:当故障被确定时，4个周期
       elseif isempty(find(NoUpdate==s1n,1))~=1
-          %重构故障
+          %重构故障 
           Data2Controller(k,s1n)=[Data2Controller(k,1:6) 1]*ab(:,s1n);
+          
       %3：无故障时
       else
         %更新拟合模型
@@ -124,6 +137,7 @@ for k=m:totaltime%length(Data2Sensor_Fault)
             %====状态更新====
             ab(:,s1n)=ab(:,s1n)+K*(Data2Controller(k,s1n)-H*ab(:,s1n));
             %当故障发生时，利用当前模型产生重构信号
+            %选择2：保留w不变
           end   
       end
  end
