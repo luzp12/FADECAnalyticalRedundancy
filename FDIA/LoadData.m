@@ -10,7 +10,7 @@ pt = {dt.name};
 % P0=1.013;%标准大气压，单位MBar,百帕
 %%只加载第一次飞行数据即可
 nA=8;
-DataJudgement=DataJudgement(:,1:nA);
+% DataJudgement=[DataJudgement(:,1:nA) [0;0.25]];
 for k =33
     load(dt(k).name);
     M=length(FF_1.data);
@@ -29,19 +29,25 @@ for k =33
 %     A(:,9)=VIB_1.data; 
 end 
 %%方便观察数据，归一化后绘图
+A=A(1500:22000,:);
+close all;
 figure(1)
 plot(A(:,[1 2 3 4])*diag(1./DataJudgement(2,[1 2 3 4])));
-legend('N1','N2','FF','EGT');%,'TAT','PT','OIP','OIT','PLA');
 
+hold on ;
+plot(ALT.data/30000,'black');
+plot(PLA_1.data/100,'yellow');
+plot(MACH.data,'m');
+legend('N1','N2','FF','EGT','ALT','PLA','MACH');%,'TAT','PT','OIP','OIT');
 %%截取数据并保存，原始数据->提取->插值->截取
-A=A(4500:20000,:);
+grid on;
 figure(2)
-plot(A(:,[6 7 8 ])*diag(1./DataJudgement(2,[6 7 8])));
+plot(A(:,[6 7 8 ])*diag(1./DataJudgement(2,[6 7 8 ])));
 legend('PT','OIP','OIT');
 ylim([0.3 1.1])
 %去除坏点
 Fn=100;
-for i=2:length(A);
+for i=3000:length(A);
 %     Amean=mean(A(i-Fn+1:i-1,:));
 %     Asigma=std(A(i-Fn+1:i-1,:));
 %      for k=6:nA
@@ -58,18 +64,19 @@ end
 
 
 figure(3)
-plot(A(:,[6 7 8])*diag(1./DataJudgement(2,[6 7 8])));
+plot(A(:,[6 7 8 ])*diag(1./DataJudgement(2,[6 7 8])));
 legend('PT','OIP','OIT');
  
 A(:,7)=smooth(A(:,7),30);
 A(:,8)=smooth(A(:,8),50);
+% A(:,9)=smooth(A(:,9),50);
 
 figure(4)
 plot(A(:,[6 7 8])*diag(1./DataJudgement(2,[6 7 8])));
 legend('PT','OIP','OIT');
 
 
- save('Data01.mat','A');
+%  save('Data02.mat','A');
  
 
 %  figure(4)
