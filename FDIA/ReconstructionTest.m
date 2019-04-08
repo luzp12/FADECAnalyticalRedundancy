@@ -19,7 +19,7 @@ P=10^6.*eye(7,7);
 %%开始仿真
 for k=1:length(M)
   %当故障未发生时，利用卡尔曼滤波更新模型
-  if k <tfault&&abs((M(k,nx)-[M(k,1:6) 1]*ab(:,nx)))>0.01*DataJudgement(2,nx)
+  if  k <tfault&&abs((M(k,nx)-[M(k,1:6) 1]*ab(:,nx)))>0.01*DataJudgement(2,nx)
     %====计算模型参数====
     %计算 A: x=Ax,7*7
     Aab=eye(7,7);
