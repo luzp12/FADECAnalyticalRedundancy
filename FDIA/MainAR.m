@@ -8,7 +8,7 @@ load DataJudgement.mat;
 n=8;
 M=A(:,1:n);
 Mc=zeros(size(M));
-for AR_Sensor=1:n
+for AR_Sensor=8
 %参数矩阵周期数,子空间维数,初始化子空间
 m=30;maxrank=6;
 U =orth(randn(m,maxrank));
