@@ -1,4 +1,4 @@
-function [Mc,U]=ARbyGROUSE(U,M,Omega,maxrank,Psai0,NoUpdate)
+function [Mc,U,RW]=ARbyGROUSE(U,M,Omega,maxrank,Psai0,NoUpdate)
 %% Grouse algorithm for Analytical Redundancy
 % With reference to L. Balzano, R. Nowak and B. Recht, "Online Identification and Tracking of Subspaces from Highly Incomplete Information," 
 %
@@ -72,5 +72,6 @@ for k=1:n,
     R(k,:)=(Psai*U_Omega)\(Psai*v_Omega);
 end
 Mc=U*R';
+RW=R';
 
 
